@@ -7,7 +7,7 @@ export const userRouter = Router();
 userRouter.post('/users', async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) {
-    return res.status(400).json({ requiredFields: ['email', 'password'] });
+    return res.status(422).json({ requiredFields: ['email', 'password'] });
   }
   const emailAlreadyExists = await db.user.findUnique({ where: { email } })
   if (emailAlreadyExists) {
@@ -31,6 +31,11 @@ userRouter.get('/users', async (_, res) => {
 userRouter.put('/users/:id', async (req, res) => {
   const { id } = req.params;
   const { password } = req.body
+
+  if(!password) {
+    return res.status(422).json({requiredFields: ['password']})
+  }
+
   const foundUser = await db.user.findUnique({ where: { id } });
   if (!foundUser) {
     return res.status(404).json({ error: 'User not found' });
